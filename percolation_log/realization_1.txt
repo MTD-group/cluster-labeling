@@ -1,0 +1,54 @@
+* Realization: 1
+Iteration: 1
+Starting compositions: [0.15 0.2  0.25 0.3  0.35]
+Percolating compositions: [0.318, 0.354]
+The system is percolating at p = 0.3180
+
+Iteration: 2
+Starting compositions: [0.288 0.303 0.318 0.328 0.338]
+Percolating compositions: [0.308, 0.318, 0.342, 0.344, 0.348]
+The system is percolating at p = 0.3080
+
+Iteration: 3
+Starting compositions: [0.278 0.293 0.308 0.318 0.328]
+Percolating compositions: [0.29, 0.312, 0.324, 0.342, 0.344]
+The system is percolating at p = 0.2900
+
+Iteration: 4
+Starting compositions: [0.26  0.275 0.29  0.3   0.31 ]
+Percolating compositions: [0.252, 0.28, 0.312, 0.318, 0.328]
+The system is percolating at p = 0.2520
+
+Iteration: 5
+Starting compositions: [0.222 0.237 0.252 0.262 0.272]
+Percolating compositions: [0.248, 0.258, 0.276]
+The system is percolating at p = 0.2480
+
+Iteration: 6
+Starting compositions: [0.218 0.233 0.248 0.258 0.268]
+Percolating compositions: [0.252, 0.272]
+The system is percolating at p = 0.2520
+
+Iteration: 7
+Starting compositions: [0.222 0.237 0.252 0.262 0.272]
+Percolating compositions: [0.248, 0.258, 0.276]
+The system is percolating at p = 0.2480
+
+Iteration: 8
+Starting compositions: [0.218 0.233 0.248 0.258 0.268]
+Percolating compositions: [0.252, 0.272]
+The system is percolating at p = 0.2520
+
+Iteration: 9
+Starting compositions: [0.222 0.237 0.252 0.262 0.272]
+Percolating compositions: [0.248, 0.258, 0.276]
+The system is percolating at p = 0.2480
+
+Iteration: 10
+Starting compositions: [0.218 0.233 0.248 0.258 0.268]
+Percolating compositions: [0.252, 0.272]
+The system is percolating at p = 0.2520
+
+Percolation composition list for 10 iterations: [0.318, 0.308, 0.29, 0.252, 0.248, 0.252, 0.248, 0.252, 0.248, 0.252]
+! Final percolation threshold: 0.2480
+Time elapsed: 26.660459245999846
