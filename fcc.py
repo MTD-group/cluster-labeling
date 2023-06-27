@@ -1,13 +1,7 @@
 # Function to populate the list NodeNext nearest neighbors list 
-
-from numba import njit 
 import numpy as np
 import os
-from numba.typed import List
-@njit()
-def labelling(Nx, Ny, Nz,num_atoms,composition):
-    #myfile = open(filename,"w")
-    #myfile.write("Node\tNodeS\tNodeNext\n")
+def labeling(Nx, Ny, Nz, num_atoms, composition, seed, generate_init_struct=False):
     NodeNext = []
     Node = []
     NodeS = []
@@ -15,7 +9,14 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
     coord = np.zeros((num_atoms,3),dtype=float)
     particles=0
     ctr1 = ctr2 = 0
+    rng = np.random.default_rng(seed=seed)
+    count_A = 0
+    final_comp = 0
     for k in range(2*Nz):
+        '''
+        Code segment for randomly populating an FCC lattice and storing atom positions 
+        for tracking the nearest neighbors.
+        '''
         ctr1 += 1
         ctr2 = 0
         for i in range(2*Nx):
@@ -33,10 +34,24 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
                 particles += 1
                 Node.append(particles)
     for i in range(num_atoms):
-            if (np.random.random_sample() < composition):
-                NodeS.append(1)
-            else:
-                NodeS.append(0)
+        if (rng.random() < composition):
+            NodeS.append(1)
+            count_A += 1
+
+        else:
+            NodeS.append(0)
+    final_comp = count_A/num_atoms
+    # The segment is executed if initial unlabeled structure needs to be visualized.
+    if generate_init_struct == True:
+        infilename = f"initial3D_{Nx}x{Ny}x{Nz}_{composition:0.2f}"
+        with open(os.path.join("./output_xyz",infilename + ".xyz"), "w") as f:
+            f.write("%d\n" % (num_atoms))
+            f.write("%s\n" % "Type X Y Z Radius")                
+            for i in range(num_atoms):
+                f.write("%s %f %f %f %f\n" % (NodeS[i],coord[i,0],coord[i,1],
+                                            coord[i,2],0.1))
+                
+    # Loop for generating the nearest neighbor list.   
     for m in range(num_atoms):
         I,J,K = coord[m,0],coord[m,1],coord[m,2]
         nn1 = nn2 = nn3 = nn4 =nn5 =  nn6 = nn7 = nn8 = nn9 = nn10 = nn11 = nn12 = 0
@@ -307,7 +322,6 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
         elif (J == 0.0 and (I != 0.0 and I != float(Nx-0.5))  and (K != 0.0 and K != float(Nz-0.5))):
             nn3 = nn4 = nn11 = nn12 = 0
             for p in range(num_atoms):
-                # Keeping all the I index constant
                 if (((coord[p,1] == J+0.5) and (coord[p,2] == K+0.5)) and coord[p,0] == I):
                     nn1 = Node[p]
                 if (((coord[p,1] == J+0.5) and (coord[p,2] == K-0.5)) and coord[p,0] == I):
@@ -461,24 +475,9 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
                     nn11 = Node[p]
                 if (((coord[p,0] == I-0.5) and (coord[p,1] == J-0.5)) and coord[p,2] == K):
                     nn12 = Node[p]
-        '''
-        if opt == "check":
-            if (Node[m] != 0):
-                assert(nn1 == 0 or Node[m] == nn1)
-                assert(nn2 == 0 or Node[m] == nn2)
-                assert(nn3 == 0 or Node[m] == nn3)
-                assert(nn4 == 0 or Node[m] == nn4)
-                assert(nn5 == 0 or Node[m] == nn5)
-                assert(nn6 == 0 or Node[m] == nn6)
-                assert(nn7 == 0 or Node[m] == nn7)
-                assert(nn8 == 0 or Node[m] == nn8)
-                assert(nn9 == 0 or Node[m] == nn9)
-                assert(nn10 == 0 or Node[m] == nn10)
-                assert(nn11 == 0 or Node[m] == nn11)
-                assert(nn12 == 0 or Node[m] == nn12)
-        '''
         nnlist = [nn1,nn2,nn3,nn4,nn5,nn6,nn7,nn8,nn9,nn10,nn11,nn12]
         NodeNext.append(nnlist)
+
     # Cluster labelling segment of the code            
     NodeL = [0]*len(Node)
     NodeLP = []
@@ -518,6 +517,7 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
         while (NodeLP[N-1]<N):
             N = NodeLP[N-1]
         NodeLP[i-1] = N
+    NodeLP1 = []
     NodeLP1 = NodeLP.copy()
     NodeLP1.sort()
     lst = [a > b for a,b in zip(NodeLP1[1:],NodeLP1[0:-1])]
@@ -535,31 +535,34 @@ def labelling(Nx, Ny, Nz,num_atoms,composition):
         for j,e in enumerate(NodeL):
             if (i == e):
                 NodeL[j] = NodeLP[i-1]
-    # Printing the final structure
-    return NodeL, coord
-        
+    # Return the coordinates of atoms and the assigned cluster labels.
+    return NodeL, coord, final_comp
+
+# To be executed for generating labelled FCC structures for visualization purpose.       
 if __name__ == '__main__':
+    # To record the code execution time
     from time import perf_counter
     import sys
     t_start = perf_counter()
-    comp=0.3
-    dimension = 3
+    # Define the variables for which the labelled structure needs to be generated. 
+    comp = 0.15
     sys_size = int(sys.argv[1])
+    seed = int(sys.argv[2])
     Nx = Ny = Nz = sys_size
     num_atoms = 4*Nx*Ny*Nz
-    infilename = "initial%dD_%0.2f" % (dimension,comp)
-    outfilename = "final%dD_%0.2f" % (dimension,comp)
+    # Variables for storing the coordinates of atoms and the assigned labels.
     coord = np.zeros((num_atoms,3),dtype=float)
     NodeL = []
-    NodeL, coord = labelling(Nx,Ny,Nz,num_atoms,comp)
-    
-    with open(os.path.join("./fcc",outfilename+".xyz"), "w") as f:
+    NodeL, coord, final_comp = labeling(Nx, Ny, Nz, num_atoms, comp, seed, generate_init_struct=True)
+    # Storing the final structure in a XYZ file for visualization.
+    outfilename = f"final3D_{Nx}x{Ny}x{Nz}_{comp:0.2f}" 
+    with open(os.path.join("./output_xyz",outfilename + ".xyz"), "w") as f:
         f.write("%d\n" % (num_atoms))
         f.write("%s\n" % "Type X Y Z Radius")                
         for i in range(num_atoms):
             f.write("%s %f %f %f %f\n" % (NodeL[i],coord[i,0],coord[i,1],
                                         coord[i,2],0.1))
-    
+    # Report the total time for code execution.
     t_stop = perf_counter()
-    print("Time elapsed: %.4f" % (t_stop-t_start))
+    print("Time elapsed: %.4f sec" % (t_stop-t_start))
         
