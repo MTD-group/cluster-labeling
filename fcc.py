@@ -1,4 +1,12 @@
-# Function to populate the list NodeNext nearest neighbors list 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Author: Abhinav Roy
+
+Lab: MTD + McCue Research Group 
+Department: Materials Science and Engineering
+University: Northwestern University
+"""
 import numpy as np
 import os
 def labeling(Nx, Ny, Nz, num_atoms, composition, seed, generate_init_struct=False):
