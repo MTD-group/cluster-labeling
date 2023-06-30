@@ -8,7 +8,7 @@ Department: Materials Science and Engineering
 University: Northwestern University
 
 script execution command:
-python3 percolation.py system_size lattice seed 
+python3 percolation.py system_size seed 
 example for the case when passing command line arguments: python3 percolation.py 5 140 
 """
 import fcc
